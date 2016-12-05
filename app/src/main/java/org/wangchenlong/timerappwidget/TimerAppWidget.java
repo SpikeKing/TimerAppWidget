@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +25,7 @@ import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
  */
 public class TimerAppWidget extends AppWidgetProvider {
 
-    // 更新小部件的广播
+    // 更新小插件的广播
     private static final String CHANGE_STATE = "org.wangchenlong.timerappwidget.action.CHANGE_STATE";
 
     @DrawableRes
@@ -45,8 +44,8 @@ public class TimerAppWidget extends AppWidgetProvider {
             R.string.yoo_na
     };
 
-    private long mLastTime = 0L;
-    private static boolean sIsUpdate = false;
+    private long mUpdateImageLastTime = 0L; // 上次更新图片的时间
+    private static boolean sIsUpdate = false; // 是否启动更新时间
 
     @Override public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
@@ -62,67 +61,60 @@ public class TimerAppWidget extends AppWidgetProvider {
     }
 
     /**
-     * 启动更新小部件的时间
+     * 启动更新小插件的时间
      *
      * @param context 上下文
      */
     public void startUpdate(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        // 获取当前的组件
-        ComponentName widget = new ComponentName(context, TimerAppWidget.class);
-        // 获取系统的AppWidgetManager
-        AppWidgetManager awm = AppWidgetManager.getInstance(context);
-
-        // 设置关闭显示
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.app_widget_timer);
-        rv.setTextViewText(R.id.widget_b_control, context.getString(R.string.stop));
-
-        // 更新页面组件
-        awm.updateAppWidget(widget, rv);
-        int appWidgetIds[] = awm.getAppWidgetIds(widget);
-        // 更新数据
-        awm.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_tv_text);
-
-        Intent alertIntent = new Intent(context, TimerAppWidget.class);
-        alertIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE); // 设置更新活动
-        alertIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds); // 设置当前部件的ID
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, alertIntent,
-                FLAG_CANCEL_CURRENT); // 取消前一个更新
 
         // 设置更新
-        am.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 1000, pi);
+        am.setRepeating(AlarmManager.RTC, System.currentTimeMillis(),
+                1000, getUpdateIntent(context, true));
     }
 
     /**
-     * 停止更新小部件的时间
+     * 停止更新小插件的时间
      *
      * @param context 上下文
      */
     public void stopUpdate(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // 取消更新
+        am.cancel(getUpdateIntent(context, false));
+    }
+
+    /**
+     * 获取需要更新的延迟消息
+     *
+     * @param context 上下文
+     * @return 延迟消息
+     */
+    private PendingIntent getUpdateIntent(Context context, boolean isStart) {
         // 获取当前的组件
         ComponentName widget = new ComponentName(context, TimerAppWidget.class);
+
+        // 获取布局, 并设置关闭显示
+        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.app_widget_timer);
+        if (isStart) {
+            rv.setTextViewText(R.id.widget_b_control, context.getString(R.string.stop));
+        } else {
+            rv.setTextViewText(R.id.widget_b_control, context.getString(R.string.start));
+        }
+
         // 获取系统的AppWidgetManager
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
-
-        // 设置关闭显示
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.app_widget_timer);
-        rv.setTextViewText(R.id.widget_b_control, context.getString(R.string.start));
 
         // 更新页面组件
         awm.updateAppWidget(widget, rv);
         int appWidgetIds[] = awm.getAppWidgetIds(widget);
-        // 更新数据
-        awm.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_tv_text);
 
         Intent alertIntent = new Intent(context, TimerAppWidget.class);
         alertIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE); // 设置更新活动
-        alertIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds); // 设置当前部件的ID
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, alertIntent,
+        alertIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds); // 设置当前插件的ID
+        return PendingIntent.getBroadcast(context, 0, alertIntent,
                 FLAG_CANCEL_CURRENT); // 取消前一个更新
-
-        // 取消更新
-        am.cancel(pi);
     }
 
     @Override
@@ -137,24 +129,29 @@ public class TimerAppWidget extends AppWidgetProvider {
 
         // 设置文字
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
-        rv.setTextViewText(R.id.widget_tv_text, sdf.format(date));
+        rv.setTextViewText(R.id.widget_tv_text, sdf.format(date)); // 设置文字
 
         // 更换图片
         long seconds = TimeUnit.MILLISECONDS.toSeconds(date.getTime());
-        long interval = (seconds - mLastTime) / 5L; // 每隔5秒更换图片与图片文字
-        if (mLastTime == 0L || interval == 0L) {
-            rv.setImageViewResource(R.id.widget_tv_image, mAvatars[(int) interval % 4]);
+        long interval = (seconds - mUpdateImageLastTime) / 5L; // 每隔5秒更换图片与图片文字
+        if (mUpdateImageLastTime == 0L || interval == 0L) {
+            rv.setImageViewResource(R.id.widget_tv_image, mAvatars[(int) interval % 4]); // 设置图片
             rv.setTextViewText(R.id.widget_tv_image_text, context.getString(mNames[(int) interval % 4]));
 
-            mLastTime = seconds;
+            mUpdateImageLastTime = seconds;
         }
 
-        // 开启或关闭时间的控制
-        Intent intent = new Intent(CHANGE_STATE);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_CANCEL_CURRENT);
-        rv.setOnClickPendingIntent(R.id.widget_b_control, pi);
+        // 点击头像跳转主页
+        Intent mainIntent = new Intent(context, MainActivity.class);
+        PendingIntent mainPi = PendingIntent.getActivity(context, 0, mainIntent, FLAG_CANCEL_CURRENT);
+        rv.setOnClickPendingIntent(R.id.widget_tv_image, mainPi); // 设置点击事件
 
-        // 更新部件
+        // 开启或关闭时间的控制
+        Intent changeIntent = new Intent(CHANGE_STATE);
+        PendingIntent changePi = PendingIntent.getBroadcast(context, 0, changeIntent, FLAG_CANCEL_CURRENT);
+        rv.setOnClickPendingIntent(R.id.widget_b_control, changePi);
+
+        // 更新插件
         appWidgetManager.updateAppWidget(widget, rv);
     }
 }
