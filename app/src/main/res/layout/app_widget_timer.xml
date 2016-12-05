@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bkg_widget"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/widget_tv_image"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center|start"
+        android:contentDescription="@null"
+        android:src="@drawable/avatar_tiffany"/>
+
+    <TextView
+        android:id="@+id/widget_tv_image_text"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_toEndOf="@id/widget_tv_image"
+        android:layout_toRightOf="@id/widget_tv_image"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        tools:text="Tiffany!"/>
+
+    <TextView
+        android:id="@+id/widget_tv_text"
+        android:layout_width="144dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:layout_toEndOf="@id/widget_tv_image_text"
+        android:layout_toRightOf="@id/widget_tv_image_text"
+        android:background="@android:color/transparent"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        tools:text="2016/12/05 10:58:56"/>
+
+    <Button
+        android:id="@+id/widget_b_control"
+        android:layout_width="60dp"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/bkg_widget_btn"
+        android:text="@string/start"
+        android:textColor="@color/widget_bkg"
+        android:textStyle="bold"/>
+
+</RelativeLayout>

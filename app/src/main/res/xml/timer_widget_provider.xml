@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:initialLayout="@layout/app_widget_timer"
+    android:minHeight="52dp"
+    android:minWidth="260dp"
+    android:previewImage="@drawable/preview_widget"
+    android:resizeMode="horizontal"
+    android:updatePeriodMillis="0"/>
