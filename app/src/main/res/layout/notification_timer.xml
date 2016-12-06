@@ -3,8 +3,8 @@
     android:id="@+id/widget_rl_main"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="52dp"
-    android:background="@drawable/bkg_widget"
+    android:layout_height="match_parent"
+    android:background="@color/msg_bkg"
     android:orientation="horizontal"
     android:padding="8dp">
 

@@ -4,5 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="widget_bkg">#FF6EB4</color>
+    <color name="msg_bkg">#FF6EB4</color>
 </resources>
