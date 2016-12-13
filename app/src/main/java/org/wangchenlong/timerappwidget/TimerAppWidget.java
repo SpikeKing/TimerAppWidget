@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 /**
  * 实时更新数据的小控件, 每隔2秒更换图片, 显示时间.
@@ -26,10 +27,17 @@ import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 public class TimerAppWidget extends AppWidgetProvider {
 
     // 更新小插件的广播
-    private static final String CHANGE_STATE = "org.wangchenlong.timerappwidget.action.CHANGE_STATE";
+    public static final String CHANGE_STATE = "org.wangchenlong.timerappwidget.action.CHANGE_STATE";
+    private static boolean sIsUpdate = false; // 是否启动更新时间
+
+    // 每次更新都会创建新的实例, 只能使用静态变量
+    private static int sImageIndex = 0;
+    private static long sUpdateImageLastTime = 0L; // 上次更新图片的时间
+
+    public static int IMAGE_COUNT = 4; // 图片数量
 
     @DrawableRes
-    private static final int[] mAvatars = new int[]{
+    public static final int[] mAvatars = new int[]{
             R.drawable.avatar_tiffany,
             R.drawable.avatar_jessica,
             R.drawable.avatar_soo_young,
@@ -37,15 +45,12 @@ public class TimerAppWidget extends AppWidgetProvider {
     };
 
     @StringRes
-    private static final int[] mNames = new int[]{
+    public static final int[] mNames = new int[]{
             R.string.tiffany,
             R.string.jessica,
             R.string.soo_young,
             R.string.yoo_na
     };
-
-    private long mUpdateImageLastTime = 0L; // 上次更新图片的时间
-    private static boolean sIsUpdate = false; // 是否启动更新时间
 
     @Override public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
@@ -133,22 +138,22 @@ public class TimerAppWidget extends AppWidgetProvider {
 
         // 更换图片
         long seconds = TimeUnit.MILLISECONDS.toSeconds(date.getTime());
-        long interval = (seconds - mUpdateImageLastTime) / 5L; // 每隔5秒更换图片与图片文字
-        if (mUpdateImageLastTime == 0L || interval == 0L) {
-            rv.setImageViewResource(R.id.widget_tv_image, mAvatars[(int) interval % 4]); // 设置图片
-            rv.setTextViewText(R.id.widget_tv_image_text, context.getString(mNames[(int) interval % 4]));
-
-            mUpdateImageLastTime = seconds;
+        long interval = seconds - sUpdateImageLastTime; // 每隔5秒更换图片与图片文字
+        if (sUpdateImageLastTime == 0 || interval % 5 == 0) {
+            sImageIndex++;
+            rv.setImageViewResource(R.id.widget_tv_image, mAvatars[sImageIndex % IMAGE_COUNT]); // 设置图片
+            rv.setTextViewText(R.id.widget_tv_image_text, context.getString(mNames[sImageIndex % IMAGE_COUNT]));
+            sUpdateImageLastTime = seconds;
         }
 
         // 点击头像跳转主页
         Intent mainIntent = new Intent(context, MainActivity.class);
-        PendingIntent mainPi = PendingIntent.getActivity(context, 0, mainIntent, FLAG_CANCEL_CURRENT);
+        PendingIntent mainPi = PendingIntent.getActivity(context, 0, mainIntent, FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.widget_tv_image, mainPi); // 设置点击事件
 
         // 开启或关闭时间的控制
         Intent changeIntent = new Intent(CHANGE_STATE);
-        PendingIntent changePi = PendingIntent.getBroadcast(context, 0, changeIntent, FLAG_CANCEL_CURRENT);
+        PendingIntent changePi = PendingIntent.getBroadcast(context, 0, changeIntent, FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.widget_b_control, changePi);
 
         // 更新插件

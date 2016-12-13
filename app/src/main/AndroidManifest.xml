@@ -18,7 +18,7 @@
         <receiver android:name=".TimerAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-                <action android:name="org.wangchenlong.timerappwidget.action.CHANGE_STATE" />
+                <action android:name="org.wangchenlong.timerappwidget.action.CHANGE_STATE"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
