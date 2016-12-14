@@ -28,9 +28,9 @@ public class TimerAppWidget extends AppWidgetProvider {
 
     // 更新小插件的广播
     public static final String CHANGE_STATE = "org.wangchenlong.timerappwidget.action.CHANGE_STATE";
-    private static boolean sIsUpdate = false; // 是否启动更新时间
 
     // 每次更新都会创建新的实例, 只能使用静态变量
+    private static boolean sIsUpdate = false; // 是否启动更新时间
     private static int sImageIndex = 0;
     private static long sUpdateImageLastTime = 0L; // 上次更新图片的时间
 
