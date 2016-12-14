@@ -123,8 +123,7 @@ public class TimerAppWidget extends AppWidgetProvider {
     }
 
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager,
-                         int[] appWidgetIds) {
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.app_widget_timer);

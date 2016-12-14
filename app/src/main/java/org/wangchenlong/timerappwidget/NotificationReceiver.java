@@ -24,7 +24,7 @@ import static org.wangchenlong.timerappwidget.TimerAppWidget.mAvatars;
 import static org.wangchenlong.timerappwidget.TimerAppWidget.mNames;
 
 /**
- * 更新接收器
+ * 通知栏更新
  * <p>
  * Created by wangchenlong on 16/12/13.
  */
@@ -32,7 +32,8 @@ public class NotificationReceiver extends BroadcastReceiver {
     public static int sId = new AtomicInteger(0).incrementAndGet();
 
     // 修改通知栏状态
-    public static final String NOTIFICATION_STATE = "org.wangchenlong.timerappwidget.action.NOTIFICATION_STATE";
+    public static final String NOTIFICATION_STATE =
+            "org.wangchenlong.timerappwidget.action.NOTIFICATION_STATE";
 
     private static boolean sIsUpdate = false; // 是否启动更新时间
     private static long sUpdateImageLastTime = 0L; // 上次更新图片的时间
